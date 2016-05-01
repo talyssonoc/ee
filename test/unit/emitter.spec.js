@@ -270,11 +270,12 @@ describe('EE', () => {
     context('listener do not apply to given event', () => {
       it('should do nothing', () => {
         const emitter = new Emitter();
-        const listener = () => {};
-        emitter.on('stuff_2', listener);
+        const listenerOne = () => {};
+        const listenerTwo = () => {};
+        emitter.on('stuff', listenerOne);
         
         expect(() => {
-          emitter.off('stuff', listener);
+          emitter.off('stuff', listenerTwo);
         }).to.not.throw(Error);
       });
     });
