@@ -8,6 +8,8 @@
   },
   "scripts": {
     "test": "mocha test/unit/**/*.js",
+    "coverage": "istanbul cover --report lcov node_modules/mocha/bin/_mocha -- test/unit/**/*.js",
+    "coveralls": "npm run coverage && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
     "benchmark": "node test/performance/benchmark.js"
   },
   "keywords": [
@@ -21,8 +23,10 @@
     "benchmark": "^2.1.0",
     "bluebird": "^3.3.5",
     "chai": "^3.5.0",
+    "coveralls": "^2.11.9",
     "eventemitter2": "^1.0.3",
     "eventemitter3": "^1.2.0",
+    "istanbul": "^0.4.3",
     "mocha": "^2.4.5",
     "sinon": "^1.17.3",
     "sinon-chai": "^2.8.0"

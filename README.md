@@ -2,7 +2,7 @@
 
 `ee` is an experimental event emitter. It's not event published to npm. __Don't use it__.
 
-[![Build Status](https://travis-ci.org/talyssonoc/ee.svg?branch=master)](https://travis-ci.org/talyssonoc/ee)
+[![Build Status](https://travis-ci.org/talyssonoc/ee.svg?branch=master)](https://travis-ci.org/talyssonoc/ee) [![Coverage Status](https://coveralls.io/repos/github/talyssonoc/ee/badge.svg?branch=master)](https://coveralls.io/github/talyssonoc/ee?branch=master)
 
 ## Usage
 
