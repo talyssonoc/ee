@@ -8,6 +8,44 @@ chai.use(sinonChai);
 const Emitter = require('../../');
 
 describe('EE', () => {
+  describe('._Promise', () => {
+    it('initially sets _Promise to Node promise implementation', () => {
+      expect(Emitter._Promise).to.be.equal(Promise);
+    });
+  });
+
+  describe('.setPromise', () => {
+    const Bluebird = require('bluebird');
+    
+    it('should change internal promise library', () => {
+      Emitter.setPromise(Bluebird);
+
+      expect(Emitter._Promise).to.be.equal(Bluebird);
+
+      Emitter.setPromise();
+
+      expect(Emitter._Promise).to.be.equal(Promise);
+    });
+
+    it('should use internal promise library on async emits', () => {
+      Emitter.setPromise(Bluebird);
+
+      const emitter = new Emitter();
+      const listener = () => Promise.resolve();
+      emitter.on('stuff', listener);
+
+      expect(emitter.emitAsync('stuff', {})).to.be.an.instanceof(Bluebird);
+
+      Emitter.setPromise();
+    });
+  });
+
+  describe('.EventEmitter', () => {
+    it('should be backward compatible with Node EventEmitter', () => {
+      expect(Emitter.EventEmitter).to.be.equal(Emitter);
+    });
+  });
+
   describe('#_listeners', () => {
     it('should not be instance of object', () => {
       const emitter = new Emitter();
@@ -104,6 +142,15 @@ describe('EE', () => {
           });
       });
 
+      context('has no listeners', () => {
+        it('should resolve anyway', () => {
+          const emitter = new Emitter();
+
+          // Fail if timeout
+          return emitter.emitAsync('stuff', {});
+        });        
+      });
+
       it('should trigger any listeners too', () => {
         const emitter = new Emitter();
         const spyOne = sinon.spy();
@@ -160,6 +207,15 @@ describe('EE', () => {
           });
       });
 
+      context('has no listeners', () => {
+        it('should resolve anyway', () => {
+          const emitter = new Emitter();
+
+          // Fail if timeout
+          return emitter.emitAsync('stuff', {}, true);
+        });        
+      });
+
       it('should trigger any listeners too', () => {
         const emitter = new Emitter();
         const spyOne = sinon.spy();
@@ -198,6 +254,29 @@ describe('EE', () => {
       emitter.off('stuff', listener);
 
       expect(emitter._listeners.stuff).to.have.lengthOf(1);
+    });
+
+    context('have no listeners to given event', () => {
+      it('should do nothing', () => {
+        const emitter = new Emitter();
+        const listener = () => {};
+        
+        expect(() => {
+          emitter.off('stuff', listener);
+        }).to.not.throw(Error);
+      });
+    });
+
+    context('listener do not apply to given event', () => {
+      it('should do nothing', () => {
+        const emitter = new Emitter();
+        const listener = () => {};
+        emitter.on('stuff_2', listener);
+        
+        expect(() => {
+          emitter.off('stuff', listener);
+        }).to.not.throw(Error);
+      });
     });
 
     it('should decrease _eventsCount correctly', () => {
@@ -250,6 +329,31 @@ describe('EE', () => {
       expect(listenerOne).to.have.not.been.called;
       expect(listenerTwo).to.have.been.calledWith('stuff', {});
       expect(emitter._listenersAny).to.have.lengthOf(1);
+    });
+
+    context('has not any listeners at all', () => {
+      it('should do nothing', () => {
+        const emitter = new Emitter();
+        const listener = () => {};
+        
+        expect(() => {
+          emitter.offAny(listener);
+        }).to.not.throw(Error);
+      });
+    });
+
+    context('listener is not an any listener', () => {
+      it('should do nothing', () => {
+        const emitter = new Emitter();
+        const listenerOne = () => {};
+        const listenerTwo = () => {};
+
+        emitter.onAny(listenerOne);
+        
+        expect(() => {
+          emitter.offAny(listenerTwo);
+        }).to.not.throw(Error);
+      });
     });
 
     context('remove all any listeners', () => {
@@ -418,32 +522,6 @@ describe('EE', () => {
           emitterOne.unpipe(emitterThree);
         }).to.throw(Error);
       });
-    });
-  });
-
-  describe('.setPromise', () => {
-    const Bluebird = require('bluebird');
-    
-    it('should change internal promise library', () => {
-      Emitter.setPromise(Bluebird);
-
-      expect(Emitter._Promise).to.be.equal(Bluebird);
-
-      Emitter.setPromise();
-
-      expect(Emitter._Promise).to.be.equal(Promise);
-    });
-
-    it('should use internal promise library on async emits', () => {
-      Emitter.setPromise(Bluebird);
-
-      const emitter = new Emitter();
-      const listener = () => Promise.resolve();
-      emitter.on('stuff', listener);
-
-      expect(emitter.emitAsync('stuff', {})).to.be.an.instanceof(Bluebird);
-
-      Emitter.setPromise();
     });
   });
 });
