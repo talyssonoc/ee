@@ -1,0 +1,29 @@
+{
+  "name": "ee",
+  "version": "1.0.0",
+  "description": "An experimental event emitter",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "keywords": [
+    "emitter",
+    "event",
+    "emitter"
+  ],
+  "author": "Talysson <talyssonoc@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "bluebird": "^3.3.5",
+    "chai": "^3.5.0",
+    "mocha": "^2.4.5",
+    "sinon": "^1.17.3",
+    "sinon-chai": "^2.8.0"
+  },
+  "engines": {
+    "node" : ">=6.0.0"
+  }
+}
