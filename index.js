@@ -93,6 +93,21 @@ class Emitter {
     }
   }
 
+  offAll(type = false) {
+    if(!type) {
+      this._listeners = Object.create(null);
+      this._listenersAny = undefined;
+      this._pipes = undefined;
+      this._eventsCount = 0;
+      return;
+    }
+
+    if(this._listeners[type]) {
+      delete this._listeners[type];
+      this._eventsCount--;
+    }
+  }
+
   emit(type, payload) {
     const listeners = this._listeners[type];
     const listenersAny = this._listenersAny;
@@ -213,14 +228,15 @@ class Emitter {
 
 Emitter.prototype.addListener = Emitter.prototype.on;
 Emitter.prototype.removeListener = Emitter.prototype.off;
+Emitter.prototype.removeAllListeners = Emitter.prototype.offAll;
 
 Emitter._Promise = Promise;
 
-Emitter.setPromise = function setPromise(promiseLibrary) {
+Emitter.setPromise = function setPromise(promiseLibrary = Promise) {
   this._Promise = promiseLibrary;
 };
 
 // Backward compatibility with Node native emitter
-Emitter.Emitter = Emitter;
+Emitter.EventEmitter = Emitter;
 
 module.exports = Emitter;

@@ -5,7 +5,7 @@ const sinonChai = require('sinon-chai');
 const expect = chai.expect;
 chai.use(sinonChai);
 
-const Emitter = require('../');
+const Emitter = require('../../');
 
 describe('EE', () => {
   describe('#_listeners', () => {
@@ -70,36 +70,6 @@ describe('EE', () => {
 
       expect(listener).to.have.been.calledWith('stuff', {});
       expect(emitter._listenersAny).to.be.undefined;
-    });
-  });
-
-  describe('#offAny', () => {
-    it('should remove from _listenersAny', () => {
-      const emitter = new Emitter();
-      const listenerOne = sinon.spy();
-      const listenerTwo = sinon.spy();
-      emitter.onAny(listenerOne);
-      emitter.onAny(listenerTwo);
-      emitter.offAny(listenerOne);
-      emitter.emit('stuff', {});
-
-      expect(listenerOne).to.have.not.been.called;
-      expect(listenerTwo).to.have.been.calledWith('stuff', {});
-      expect(emitter._listenersAny).to.have.lengthOf(1);
-    });
-
-    context('remove all any listeners', () => {
-      it('should delete _listenersAny', () => {
-        const emitter = new Emitter();
-        const listener = sinon.spy();
-        emitter.onAny(listener);
-        emitter.offAny(listener);
-
-        expect(emitter._listenersAny).to.be.undefined;
-
-        emitter.onAny(listener);
-        expect(emitter._listenersAny).to.be.instanceof(Array);
-      });
     });
   });
 
@@ -267,6 +237,79 @@ describe('EE', () => {
     });
   });
 
+  describe('#offAny', () => {
+    it('should remove from _listenersAny', () => {
+      const emitter = new Emitter();
+      const listenerOne = sinon.spy();
+      const listenerTwo = sinon.spy();
+      emitter.onAny(listenerOne);
+      emitter.onAny(listenerTwo);
+      emitter.offAny(listenerOne);
+      emitter.emit('stuff', {});
+
+      expect(listenerOne).to.have.not.been.called;
+      expect(listenerTwo).to.have.been.calledWith('stuff', {});
+      expect(emitter._listenersAny).to.have.lengthOf(1);
+    });
+
+    context('remove all any listeners', () => {
+      it('should delete _listenersAny', () => {
+        const emitter = new Emitter();
+        const listener = sinon.spy();
+        emitter.onAny(listener);
+        emitter.offAny(listener);
+
+        expect(emitter._listenersAny).to.be.undefined;
+
+        emitter.onAny(listener);
+        expect(emitter._listenersAny).to.be.instanceof(Array);
+      });
+    });
+  });
+
+  describe('#offAll', () => {
+    it('should remove all listeners', () => {
+      const emitter = new Emitter();
+      const listener = sinon.spy();
+      emitter.on('stuff', listener);
+      emitter.onAny(listener);
+
+      const listeners = emitter._listeners;
+      emitter.offAll();
+
+      expect(emitter._listeners).to.not.be.equal(listeners);
+      expect(emitter._eventsCount).to.be.equal(0);
+      expect(emitter._pipes).to.be.undefined;
+      expect(emitter._listenersAny).to.be.undefined;
+    });
+
+    it('should remove all listeners to given event', () => {
+      const emitter = new Emitter();
+      const listener = () => {};
+      emitter.on('stuff', listener);
+      emitter.on('stuff_2', listener);
+
+      emitter.offAll('stuff');
+
+      expect(emitter._eventsCount).to.be.equal(1);
+      expect(emitter._listeners.stuff).to.be.undefined;
+    });
+
+    it('should not call listener', () => {
+      const emitter = new Emitter();
+      const listenerOne = sinon.spy();
+      const listenerTwo = sinon.spy();
+      emitter.on('stuff', listenerOne);
+      emitter.onAny(listenerTwo);
+
+      emitter.offAll('stuff');
+      emitter.emit('stuff', {});
+
+      expect(listenerOne).to.have.not.been.called;
+      expect(listenerTwo).to.have.been.calledWith('stuff', {});
+    });
+  });
+
   describe('#listeners', () => {
     it('should return listeners to given event', () => {
       const emitter = new Emitter();
@@ -351,7 +394,7 @@ describe('EE', () => {
       emitterOne.unpipe(emitterTwo);
       emitterOne.emit('stuff', {});
       
-      expect(listenerTwo).to.not.been.called;
+      expect(listenerTwo).to.have.not.been.called;
     });
 
     context('is not piped', () => {
@@ -386,7 +429,7 @@ describe('EE', () => {
 
       expect(Emitter._Promise).to.be.equal(Bluebird);
 
-      Emitter.setPromise(Promise);
+      Emitter.setPromise();
 
       expect(Emitter._Promise).to.be.equal(Promise);
     });
@@ -400,7 +443,7 @@ describe('EE', () => {
 
       expect(emitter.emitAsync('stuff', {})).to.be.an.instanceof(Bluebird);
 
-      Emitter.setPromise(Promise);
+      Emitter.setPromise();
     });
   });
 });
