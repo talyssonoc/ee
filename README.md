@@ -25,9 +25,9 @@ const emitter = new EE();
 - `#emitAsync(type, payload, series = false)`: Emit a `type` event with `payload` asyncly and return the promise. If series is `false`, will run listeners with `Promise.all`, otherwise will run the listeners in series creating a prototype chain and return it
 - `#listeners(type)`: Return all listeners directly listening to `type` events. Listeners added with `#onAny` or `#onceAny` wil not be included
 - `#listenersAny()`: Return all listeners added with `#onAny` or `#onceAny`
-- `#pipe(otherEmitter[, namespace])`: Pipe all events to `otherEmitter`. If `namespace` is passed, `'<namespace>:'` will be prepended to event name emitter on `otherEmitter`
+- `#pipe(otherEmitter[, namespace])`: Pipe all events to `otherEmitter`. If `namespace` is passed, `'<namespace>:'` will be prepended to event name emitted on `otherEmitter`
 - `#unpipe(otherEmitter)`: Stop piping events to `otherEmitter`
-- `.setPromise(promiseLibrary = Promise)`: Set internal promise library used on async operations. If no `promiseLibrary` is passed, will use default NodeJS promise implementation. *This method should be called on `EE`, not in an instance*
+- `.setPromise(promiseLibrary = Promise)`: Set internal promise library used on async operations. If no `promiseLibrary` is passed, will use default NodeJS promise implementation. __This method should be called on `EE`, not in an instance__
 
 ## Benchmark
 
@@ -41,7 +41,7 @@ EE x 378,016 ops/sec ±1.64% (76 runs sampled)
 Fastest is EventEmitter (core)
 ```
 
-* I'm gonna use that as a goal to improve my knowledge about V8 performance :smile:
+_* I'm gonna use that as a goal to improve my knowledge about V8 performance :smile:_
 
 ## Developing
 
